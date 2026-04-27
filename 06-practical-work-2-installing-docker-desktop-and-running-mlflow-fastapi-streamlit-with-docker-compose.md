@@ -433,36 +433,139 @@ A Compose file describes **services** (containers), **volumes** (persistent stor
 
 ## 9. Project Structure for the Stack
 
-We will create the following folder structure on the host machine:
+Before writing any code, we lay out the complete folder layout. Every file you will create in the next sections has its place in this tree.
+
+### 9.1 Visual layout
 
 ```text
-mlops-stack/
-├── docker-compose.yml
-├── mlflow/
-│   └── Dockerfile
-├── fastapi/
-│   ├── Dockerfile
-│   ├── requirements.txt
-│   └── app/
-│       └── main.py
-└── streamlit/
-    ├── Dockerfile
-    ├── requirements.txt
-    └── app/
-        └── app.py
+mlops-stack/                          ← root of the project (open this in VS Code)
+│
+├── docker-compose.yml                ← orchestrates the 3 services together
+│
+├── mlflow/                           ← service 1 : tracking server
+│   └── Dockerfile                    ← how to build the MLflow image
+│
+├── fastapi/                          ← service 2 : REST API
+│   ├── Dockerfile                    ← how to build the FastAPI image
+│   ├── requirements.txt              ← Python dependencies for FastAPI
+│   └── app/                          ← FastAPI source code
+│       └── main.py                   ← the API endpoints
+│
+└── streamlit/                        ← service 3 : web UI
+    ├── Dockerfile                    ← how to build the Streamlit image
+    ├── requirements.txt              ← Python dependencies for Streamlit
+    └── app/                          ← Streamlit source code
+        └── app.py                    ← the UI code that calls FastAPI
 ```
 
-Create it now:
+> [!NOTE]
+> The folders `mlruns/` and `database/` for MLflow are **not** in this tree on purpose. They will be created automatically by Docker as **named volumes** when the stack starts (see Section 15).
+
+### 9.2 What each folder is for
+
+| Folder / File | Service | Role |
+| --- | --- | --- |
+| `docker-compose.yml` | — | Glue file. Describes the 3 services, the network, and the volumes. |
+| `mlflow/Dockerfile` | MLflow | Recipe to build the image that runs `mlflow server`. |
+| `fastapi/Dockerfile` | FastAPI | Recipe to build the image that runs `uvicorn`. |
+| `fastapi/requirements.txt` | FastAPI | List of Python packages installed at build time. |
+| `fastapi/app/main.py` | FastAPI | Endpoints `/`, `/health`, `/log-run`. |
+| `streamlit/Dockerfile` | Streamlit | Recipe to build the image that runs `streamlit run`. |
+| `streamlit/requirements.txt` | Streamlit | List of Python packages installed at build time. |
+| `streamlit/app/app.py` | Streamlit | The web form that POSTs to FastAPI. |
+
+> [!IMPORTANT]
+> Each service has its **own folder**, its **own `Dockerfile`**, and its **own `requirements.txt`**. This is on purpose:
+>
+> - images stay **small** (Streamlit does not need MLflow, etc.);
+> - builds are **faster** (Docker only rebuilds the service whose files changed);
+> - responsibilities are **clear**.
+
+### 9.3 Create the structure — Linux / macOS
+
+Open a terminal where you want the project to live and run:
 
 ```bash
 mkdir mlops-stack
 cd mlops-stack
-mkdir mlflow fastapi streamlit
-mkdir fastapi/app streamlit/app
+
+mkdir mlflow
+mkdir -p fastapi/app
+mkdir -p streamlit/app
+
+touch docker-compose.yml
+touch mlflow/Dockerfile
+touch fastapi/Dockerfile fastapi/requirements.txt fastapi/app/main.py
+touch streamlit/Dockerfile streamlit/requirements.txt streamlit/app/app.py
+```
+
+Verify with `tree` (install with `sudo apt install tree` if needed):
+
+```bash
+tree
+```
+
+Expected output:
+
+```text
+.
+├── docker-compose.yml
+├── fastapi
+│   ├── Dockerfile
+│   ├── app
+│   │   └── main.py
+│   └── requirements.txt
+├── mlflow
+│   └── Dockerfile
+└── streamlit
+    ├── Dockerfile
+    ├── app
+    │   └── app.py
+    └── requirements.txt
+```
+
+### 9.4 Create the structure — Windows PowerShell
+
+Open **PowerShell** (no admin needed) where you want the project to live and run:
+
+```powershell
+mkdir mlops-stack
+cd mlops-stack
+
+mkdir mlflow
+mkdir fastapi\app
+mkdir streamlit\app
+
+ni docker-compose.yml -ItemType File
+ni mlflow\Dockerfile -ItemType File
+ni fastapi\Dockerfile -ItemType File
+ni fastapi\requirements.txt -ItemType File
+ni fastapi\app\main.py -ItemType File
+ni streamlit\Dockerfile -ItemType File
+ni streamlit\requirements.txt -ItemType File
+ni streamlit\app\app.py -ItemType File
 ```
 
 > [!NOTE]
-> Each service has its own folder, its own `Dockerfile`, and its own `requirements.txt`. This keeps the responsibilities clean and the images small.
+> `ni` is the PowerShell short alias for `New-Item`. The `-ItemType File` flag creates an **empty file** (the equivalent of `touch` on Linux).
+
+Verify with the built-in `tree` command:
+
+```powershell
+tree /F
+```
+
+### 9.5 Open the project in your editor
+
+```bash
+code .
+```
+
+> [!IMPORTANT]
+> All commands in the next sections (`docker compose up`, `docker compose build`, etc.) **must be run from the `mlops-stack/` folder** — the one that contains `docker-compose.yml`. Compose looks for that file in the current directory.
+
+> [!WARNING]
+> Do not nest the project inside a path with spaces or accents (for example `C:\Users\Marie Dupont\Mes Documents\...`). Some Docker tools still struggle with such paths on Windows. Prefer something like `C:\dev\mlops-stack`.
 
 <p align="right"><a href="#top">↑ Back to top</a></p>
 
