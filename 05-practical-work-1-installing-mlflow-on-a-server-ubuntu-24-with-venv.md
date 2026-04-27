@@ -1,6 +1,6 @@
 <a id="top"></a>
 
-# Practical Work — Installing MLflow on an Ubuntu Virtual Machine with a Virtual Environment
+# Practical Work — Installing MLflow on an a server Ubuntu Virtual Machine with a Virtual Environment
 
 ## Table of Contents
 
