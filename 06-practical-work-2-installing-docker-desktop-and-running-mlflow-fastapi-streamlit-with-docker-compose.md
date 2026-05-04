@@ -438,7 +438,7 @@ Before writing any code, we lay out the complete folder layout. Every file you w
 ### 9.1 Visual layout
 
 ```text
-mlops-stack/                          ← root of the project (open this in VS Code)
+chap06-mlops-stack/                   ← root of the project (open this in VS Code)
 │
 ├── docker-compose.yml                ← orchestrates the 3 services together
 │
@@ -486,8 +486,8 @@ mlops-stack/                          ← root of the project (open this in VS C
 Open a terminal where you want the project to live and run:
 
 ```bash
-mkdir mlops-stack
-cd mlops-stack
+mkdir chap06-mlops-stack
+cd chap06-mlops-stack
 
 mkdir mlflow
 mkdir -p fastapi/app
@@ -529,8 +529,8 @@ Expected output:
 Open **PowerShell** (no admin needed) where you want the project to live and run:
 
 ```powershell
-mkdir mlops-stack
-cd mlops-stack
+mkdir chap06-mlops-stack
+cd chap06-mlops-stack
 
 mkdir mlflow
 mkdir fastapi\app
@@ -562,10 +562,10 @@ code .
 ```
 
 > [!IMPORTANT]
-> All commands in the next sections (`docker compose up`, `docker compose build`, etc.) **must be run from the `mlops-stack/` folder** — the one that contains `docker-compose.yml`. Compose looks for that file in the current directory.
+> All commands in the next sections (`docker compose up`, `docker compose build`, etc.) **must be run from the `chap06-mlops-stack/` folder** — the one that contains `docker-compose.yml`. Compose looks for that file in the current directory.
 
 > [!WARNING]
-> Do not nest the project inside a path with spaces or accents (for example `C:\Users\Marie Dupont\Mes Documents\...`). Some Docker tools still struggle with such paths on Windows. Prefer something like `C:\dev\mlops-stack`.
+> Do not nest the project inside a path with spaces or accents (for example `C:\Users\Marie Dupont\Mes Documents\...`). Some Docker tools still struggle with such paths on Windows. Prefer something like `C:\dev\chap06-mlops-stack`.
 
 <p align="right"><a href="#top">↑ Back to top</a></p>
 
@@ -748,7 +748,7 @@ CMD ["streamlit", "run", "app/app.py", \
 
 ## 13. The Complete `docker-compose.yml`
 
-Create the file `mlops-stack/docker-compose.yml`:
+Create the file `chap06-mlops-stack/docker-compose.yml`:
 
 ```yaml
 services:
@@ -826,7 +826,7 @@ networks:
 
 ## 14. Running the Full Stack
 
-From the `mlops-stack/` folder:
+From the `chap06-mlops-stack/` folder:
 
 ```bash
 docker compose up --build
@@ -889,11 +889,11 @@ Inspect the volumes:
 
 ```bash
 docker volume ls
-docker volume inspect mlops-stack_mlflow-db
+docker volume inspect chap06-mlops-stack_mlflow-db
 ```
 
 > [!IMPORTANT]
-> Volume names are prefixed with the project name (the folder containing `docker-compose.yml`). Here it is `mlops-stack_mlflow-db`.
+> Volume names are prefixed with the project name (the folder containing `docker-compose.yml`). Here it is `chap06-mlops-stack_mlflow-db`.
 
 ### 15.2 Service-name networking
 
@@ -955,7 +955,7 @@ Checks:
 
 - the env var must be `MLFLOW_TRACKING_URI=http://mlflow:5000` (service name, not `localhost`);
 - the MLflow container is `healthy`: `docker compose ps`;
-- both services are on the same network: `docker network inspect mlops-stack_mlops-net`.
+- both services are on the same network: `docker network inspect chap06-mlops-stack_mlops-net`.
 
 ---
 
